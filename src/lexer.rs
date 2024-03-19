@@ -1,26 +1,39 @@
+use regex::Regex;
+
+#[allow(dead_code)]
 pub enum Keywords{
     Pass,
 }
+#[allow(dead_code)]
+pub enum Arithmetic{
+    Plus,
+    Minus,
+    Multiply,
+    Division,
+    Module,
+}
 
+#[allow(dead_code)]
+pub enum Operators{
+    Arithmetic(Arithmetic),
+
+    Equal,
+}
+
+#[allow(dead_code)]
 pub enum Separators{
     OpenPar,
     ClosePar,
     OpenBra,
-    CloseBra,
+    CloseSquareBrackets,
+    OpenSquareBrackets
     
 }
 
-pub enum Operators{
-    Plus,
-    Minus,
-    Mult,
-    FlDiv,
-    IntDivg,
-    Moduleg,
-    Equal,
     
-}
-pub enum IntegerType{
+
+#[derive(Debug)]
+pub enum Integer{
     U8(u8),
     U16(u16),
     U32(u32),
@@ -30,19 +43,26 @@ pub enum IntegerType{
     I32(i32),
     I64(i64),
 }
+#[derive(Debug)]
+pub enum Float{
+    F32(f32),
+    F64(f64),
+}
+#[derive(Debug)]
 pub enum Literals{
     Bool(bool),
-    Integer(IntegerType),
-    Floats(String),
-    Char(String),
+    Integer(Integer),
+    Floats(Float),
+    Char(char),
     String(String),
 }
+#[derive(Debug)]
 pub enum Token{
     Identifier(String),
-    Keyword(Keywords),
-    Separator(Separators),
-    Operator(Operators),
+    Keyword(String),
+    Symbol(String),
     Literal(Literals),
+    Invalid(String)
 }
 
 
@@ -84,8 +104,25 @@ pub fn scan_token(input:String) -> Vec<String>{
     output.into_iter().filter(|x| x != "").collect()
     }
     
-pub fn evaluator(Vec<Strings>)-> Vec<Token>{
-    todo!();
+pub fn evaluator(input: Vec<String>)-> Vec<Token>{
+    let output:Vec<Token> = input.into_iter().map(|x| {
+    let alphanum_regex = Regex::new(r"^[a-zA-Z0-9]+$").unwrap();
+    let num_regex = Regex::new(r"^[0-9]+$").unwrap();
+        match x.len(){
+            1 => Token::Symbol(x),
+            _ => {if num_regex.is_match(&x){
+                Token::Literal(Literals::Integer(Integer::U32(x.parse().unwrap())))
+            }
+                else if alphanum_regex.is_match(&x){
+                    Token::Identifier(x)
+                }
+                else{
+                    Token::Invalid(x)
+                }
+                } ,
+        }
+    }).collect();
+        output
 }
 
 
