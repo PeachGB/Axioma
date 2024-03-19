@@ -1,5 +1,5 @@
 [package]
-name = "teorema_lang"
+name = "teorema"
 version = "0.1.0"
 edition = "2021"
 
