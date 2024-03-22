@@ -1,7 +1,9 @@
 use std::{
-    env,
+env,
     fs};
 mod scanner;
+mod parser;
+mod tree;
 
 fn main(){
     //read file from args
@@ -11,12 +13,13 @@ fn main(){
         Ok(file) => file,
         Err(error) => panic!("ERROR: {:?} could not open the file",error)
     };
-    //Takes a string and returns Vec<Token>
+    //Takes a string and returns Vec<Vec<Token>>
     let lexer = scanner::tokenizer(input);
-    
-    for token in lexer.iter(){
-        for tok in token.iter(){
-        print!("{}",tok);}
+    //takes Vec<Vec<Token>> and returns a Vec<Token> in order of operations
+    let mut parser = parser::parse_expression(lexer); 
+
+    for token in parser{
+        println!("{}",token);
     }
 
 }

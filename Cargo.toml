@@ -3,6 +3,3 @@ name = "teorema"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies]
-tree_iterators_rs = "1.2.1"
-
