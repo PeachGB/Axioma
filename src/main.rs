@@ -3,8 +3,7 @@ env,
     fs};
 mod scanner;
 mod parser;
-mod tree;
-
+mod sim;
 fn main(){
     //read file from args
     let args: Vec<String> = env::args().collect();
@@ -16,10 +15,10 @@ fn main(){
     //Takes a string and returns Vec<Vec<Token>>
     let lexer = scanner::tokenizer(input);
     //takes Vec<Vec<Token>> and returns a Vec<Token> in order of operations
-    let mut parser = parser::parse_expression(lexer); 
+    let program = parser::parse(lexer); 
+    
+    sim::simulate_program(program);
 
-    for token in parser{
-        println!("{}",token);
-    }
+    
 
 }
