@@ -6,10 +6,10 @@ The intended final product aims to look like a fusion between Haskell and some [
 
 ## Milestones
 
-- [] Turing Complete
-- [] Compiled to native code 
-- [] Self-hosted
-- [] a Std-lib  
+- [ ] Turing Complete
+- [ ] Compiled to native code 
+- [ ] Self-hosted
+- [ ] Std-lib  
 
 ## About The language
 Teorema reads the program line by line,
@@ -28,5 +28,12 @@ h$    -- you print values with (Value)$
 Conditional variable assignement
 ```teorema
 h := 5 --h = 5 
-7 > h -> x:= 6 -- if 7 > h then x = 6
+7 > h -> x:= 6  -- if 7 > h then x = 6
 ```
+
+## Sources
+[Lamda Calculus](https://en.wikipedia.org/wiki/Lambda_calculus)
+[APL](https://en.wikipedia.org/wiki/APL_(programming_language))
+[Haskell](https://www.haskell.org/)
+
+
