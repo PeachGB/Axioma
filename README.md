@@ -3,7 +3,10 @@
 
 Teorema is a functional programming language based on diverse mathematical notation and lamda calculus.
 The intended final product aims to look like a fusion between Haskell and some [array programming languages like APL](https://en.wikipedia.org/wiki/APL_(programming_language))
-
+Teorema uses only symbols and symbol combinations, except for Function names(not implemented).
+## Build
+as this is a rust program you can use cargo to compile the program
+you just run it with an arg for the path of the textfile of the program, for now it can be any extention you want
 ## Milestones
 
 - [ ] Turing Complete
