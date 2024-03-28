@@ -5,12 +5,12 @@ fn precedence(op:&Token)-> u8{
         Token::Plus(_,_) | Token::Minus(_,_) => 2,
         Token::Mult(_,_) | Token::Div(_,_) => 3,
         Token::Pow(_,_) => 4,
-        Token::OpenPar(_,_) | Token::ClosePar(_,_) => 1,
-        Token::Assign(_,_) => 0,
+        Token::Greater(_,_) | Token::Less(_,_) | Token::OpenPar(_,_) | Token::ClosePar(_,_) => 1,
+        Token::If(_,_) | Token::Assign(_,_) => 0,
         _=> 8,
     }
 }
-fn parse_line(input:Vec<Token>)->Vec<Token>{
+pub fn parse_line(input:Vec<Token>)->Vec<Token>{
 let mut output:Vec<Token> = vec![];
 let mut op_stack:Vec<Token> = vec![];
     for token in input{
@@ -26,6 +26,7 @@ let mut op_stack:Vec<Token> = vec![];
                         }
                     }
                 }
+                Token::NewLine => continue,
                 _ => if op_stack.is_empty(){op_stack.push(token)} else {
     if precedence(&token) <= precedence(op_stack.last().unwrap()){
     output.push(op_stack.pop().unwrap());
