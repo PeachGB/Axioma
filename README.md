@@ -26,7 +26,7 @@ x := 34
 
 h := 4 + x + y
 
-h$    -- you print values with (Value)$
+h$    -- you print values with "Value$"
 ```
 Conditional variable assignement
 ```teorema
