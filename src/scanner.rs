@@ -21,6 +21,11 @@ pub enum Token {
     NewLine,
     Expression(Vec<Token>, u16, u16),
 }
+
+pub struct Function{
+    name: String,
+    body: Vec<Token>,
+}
 impl Token {
     pub fn unwrap_expression(input: Token) -> Vec<Token> {
         match input {
@@ -94,11 +99,20 @@ fn scan(input: String, line: u16) -> Vec<Token> {
                     token.clear()
                 }
             }
-            '1'..='9' | 'a'..='z' | 'A'..='Z' | '_' | ':' | '-' => {
+            '1'..='9' | 'a'..='z' | 'A'..='Z' | '_' | '-' => {
                 if input.len() - 1 == i {
                     token.push(c);
                     output.push(evaluate(token.clone(), col, line));
                 } else {
+                    token.push(c)
+                };
+            }
+            ':' => {
+                if token.is_empty(){
+                    token.push(c)
+                } else {
+                    output.push(evaluate(token.clone(), col, line));
+                    token.clear();
                     token.push(c)
                 };
             }
