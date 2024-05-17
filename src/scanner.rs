@@ -20,6 +20,7 @@ pub enum Token {
     Print(u16, u16),
     NewLine,
     Expression(Vec<Token>, u16, u16),
+    Lamda(u16,u16),
 }
 
 pub struct Function{
@@ -70,6 +71,7 @@ impl fmt::Display for Token {
             Token::Print(_, _) => write!(f, "|$|"),
             Token::NewLine => write!(f, "EndOfLine"),
             Token::Expression(_, _, _) => write!(f, "Expression"),
+            Token::Lamda(_, _) => write!(f, "|λ|"),
         }
     }
 }
@@ -116,7 +118,7 @@ fn scan(input: String, line: u16) -> Vec<Token> {
                     token.push(c)
                 };
             }
-            '<' | '>' | '^' | '+' | '*' | '/' | '!' | '(' | ')' | '=' | '$' => {
+            '<' | '>' | '^' | '+' | '*' | '/' | '!' | '(' | ')' | '=' | '$' | '\\'=> {
                 if token.is_empty() {
                     token = String::from(c);
                     output.push(evaluate(token.clone(), col, line));
@@ -167,6 +169,7 @@ fn evaluate(input: String, col: u16, line: u16) -> Token {
             '<' => Token::Less(col, line),
             '=' => Token::Equal(col, line),
             '$' => Token::Print(col, line),
+            '\\' => Token::Lamda(col,line),
             _ => Token::Invalid(input, col, line),
         },
         _ => match input.chars().next().unwrap_or_else(|| {

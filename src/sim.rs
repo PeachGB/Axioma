@@ -82,7 +82,7 @@ pub fn simulate_program(input: Vec<Token>) -> HashMap<String, String> {
                 std::process::exit(1);
             }
             x => {
-                println!("Token not Defined: |{}|", x);
+                println!("Token not Defined: \'{}\'", x);
                 std::process::exit(1);
             }
         }
