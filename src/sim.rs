@@ -150,14 +150,13 @@ fn op_equal(x: String, y: String) -> String {
 }
 fn op_if(value: String, expression: Token) -> Option<HashMap<String, String>> {
     if let Ok(boolean) = value.parse() {
-        match boolean {
-            true => {
-                let expression: Vec<Token> = Token::unwrap_expression(expression);
-                let parsed: Vec<Token> = parser::parse_line(expression);
-                let mem = simulate_program(parsed);
-                return Some(mem);
-            }
-            false => return None,
+        if boolean {
+            let expression: Vec<Token> = Token::unwrap_expression(expression);
+            let parsed: Vec<Token> = parser::parse_line(expression);
+            let mem = simulate_program(parsed);
+            return Some(mem);
+        } else {
+            return None
         }
     }
     println!("expected boolean at");
