@@ -1,6 +1,7 @@
 use std::{env, fs};
 mod scanner;
-mod interpreter;
+
+//mod interpreter;
 fn main() {
     //read file from args
     let args: Vec<String> = env::args().collect();
@@ -19,9 +20,14 @@ fn main() {
         }
     };
     //Takes a string and returns Vec<Vec<Token>>
-    let program = scanner::tokenizer(input);
+    let tokens = scanner::tokenize(input);
+    for token in tokens {
+        println!("{:?}", token);
+    }
+    // let tokens = preproc::process(tokens);
     //takes Vec<Vec<Token>> and returns a Vec<Token> in order of operations
 
-    let interpreter = interpreter::Interpreter::new();
+    //let mut interpreter = interpreter::Interpreter::new();
+    //interpreter.set(program);
     
 }

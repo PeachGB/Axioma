@@ -1,4 +1,6 @@
-let S = { x : x < 3 }
-
-f : S -> A
-
+axiom setup = {
+if 3 != 2{
+1 + 3
+}
+axio
+}
