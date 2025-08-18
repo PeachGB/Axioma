@@ -1,6 +1,7 @@
+use std::collections::HashMap;
 use crate::scanner::Token::*;
 use crate::scanner::Error::*;
-
+use crate::scanner::Associativity::*;
 
 pub enum Error {
     InvalidCharacter( char),
@@ -23,6 +24,7 @@ pub struct Scanner {
     column: usize,
     error: Option<Error>,
     tokens: Vec<Token>,
+    keywords: HashMap<String,Token>,
 }
 
 macro_rules! if_peek_match_scan {
@@ -37,16 +39,17 @@ macro_rules! if_peek_match_scan {
         };
     }
 impl Scanner {
-    pub fn new(input: String) -> Scanner {
+    pub fn new(input: String, keywords: HashMap<String,Token>) -> Scanner {
         Scanner {
             input,
             start: 0,
             position: 0,
-            current_char: None,
+            current_char: Option::None,
             line: 1,
-            error:None,
+            error:Option::None,
             column: 1,
             tokens: Vec::new(),
+            keywords,
         }
     }
     fn peek(&self) -> Option<char>
@@ -80,7 +83,7 @@ impl Scanner {
 
     fn scan_token(&mut self) {
 
-        let token = Token::new(&self.input[self.start..self.position]);
+        let token = Token::new(&self.input[self.start..self.position],&self.keywords);
         match token{
             Ok(x) => self.tokens.push(x),
             Err(x) => self.error = Some(x),
@@ -113,6 +116,14 @@ impl Scanner {
                 ':' => self.scan_token(),
                 '+' => self.scan_token(),
                 '-' => self.scan_token(),
+                '>' => {
+                    if_peek_match_scan!(self, '=');
+                    self.scan_token()
+                },
+                '<' => {
+                    if_peek_match_scan!(self, '=');
+                    self.scan_token()
+                }
                 '!' => {
                     if_peek_match_scan!(self, '=');
                     self.scan_token()
@@ -162,10 +173,8 @@ pub enum Token {
     Identifier(String),
     //Single Char Token
     Operator(char),
-    LeftParen,
-    RightParen,
-    LeftBrace,
-    RightBrace,
+    OpenDelimiter(char),
+    CloseDelimiter(char),
     Equal,
     Comma,
     Semicolon,
@@ -173,28 +182,43 @@ pub enum Token {
     Exclamation,
 
     //Boolean Operators
-    NotEq,
+    NotEq,Eq, LessThan,GreaterThan,LessThanEq,GreaterThanEq,
+
+    //Keywords
+    Fn,Let,Axiom,If,While,For,Var,
+}
+pub enum Associativity{
+    Left,Right,None
 }
 
 impl Token{
-    pub fn new(input: &str) -> Result<Token,Error>{
+    pub fn new(input: &str,keywords:&HashMap<String, Token>) -> Result<Token,Error>{
         match input{
-             a @ ("+" |  "-" | "*" | "/" | "^")  => Ok(Operator(a.chars().next().unwrap())),
-            "(" => Ok(LeftParen),
-            ")" => Ok(RightParen),
-            "{" => Ok(LeftBrace),
-            "}" => Ok(RightBrace),
+            a @ ("+" |  "-" | "*" | "/" | "^")  => Ok(Operator(a.chars().next().unwrap())),
+            c @ ("(" |  "{")  => Ok(OpenDelimiter(c.chars().next().unwrap())),
+            c @ (")" | "}")  => Ok(CloseDelimiter(c.chars().next().unwrap())),
             "," => Ok(Comma),
             ";" => Ok(Semicolon),
             ":" => Ok(Colon),
             "=" => Ok(Equal),
             "!" => Ok(Exclamation),
+
             "!=" => Ok(NotEq),
-            x if x.chars().all(char::is_numeric) => match x.parse::<i32>() {
+            "==" => Ok(Eq),
+            "<" => Ok(LessThan),
+            ">" => Ok(GreaterThan),
+            "<=" => Ok(LessThanEq),
+            ">=" => Ok(GreaterThanEq),
+
+            x if keywords.contains_key(x) => Ok(keywords[x].clone()),
+
+            x if x.chars().all(|c| c.is_numeric() || c == '.') => match x.parse::<i32>() {
                 Ok(x) => Ok(Number(x)),
                 Err(_) => Err(InvalidToken(x.to_string())),
             },
-            x if x.chars().next().unwrap().is_alphabetic() => Ok(Identifier(x.to_string())),
+            x if x.chars().next().unwrap().is_alphabetic() =>{
+                Ok(Identifier(x.to_string()))
+            },
             x => Err(InvalidToken(x.to_string())),
         }
     }
@@ -207,31 +231,53 @@ impl Token{
 
         }
 
-}
-impl std::fmt::Display for Token {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    pub fn associativity(&self) -> Associativity{
         match self{
-            Number(x) => write!(f,"Number: {}",x),
-            Identifier(x) => write!(f,"Identifier: {}",x),
-            Operator(x) => write!(f,"Operator: {}",x),
-            Equal => write!(f,"Equal"),
-            LeftParen => write!(f,"Left Paren"),
-            RightParen => write!(f,"Right Paren"),
-            LeftBrace => write!(f,"Left Brace"),
-            RightBrace => write!(f,"Right Brace"),
-            Comma => write!(f,"Comma"),
-            Semicolon => write!(f,"Semicolon"),
-            Colon => write!(f,"Colon"),
-            Exclamation => write!(f,"Exclamation"),
-            NotEq => write!(f,"Not Equal"),
+            Operator(a) =>{
+                match a{
+                    '+' => Left,
+                    '-' => Left,
+                    '*' => Left,
+                    '/' => Left,
+                    '^' => Right,
+                    _=> None,
+                }
+
+            },
+            Equal         |
+            Eq            |
+            NotEq         |
+            GreaterThan   |
+            LessThan      |
+            GreaterThanEq |
+            LessThanEq => Right,
+
+
+            _=> None,
         }
     }
 }
 
 
 
+
+
+macro_rules! token_keywords_map {
+    ($($str:ident),*) => {
+        {
+            let mut m:HashMap<String, Token> = HashMap::new();
+            $(
+            m.insert(stringify!($str).to_lowercase(),Token::$str);
+            )*
+            m
+        }
+    };
+}
 pub fn tokenize (input: String) -> Vec<Token> {
-    let mut scanner = Scanner::new(input);
+
+    let keywords:HashMap<String,Token> = token_keywords_map![Fn,Let,Axiom,If,While,For,Var];
+
+    let mut scanner = Scanner::new(input,keywords);
     scanner.scan();
     scanner.tokens
 }

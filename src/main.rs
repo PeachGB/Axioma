@@ -1,5 +1,6 @@
 use std::{env, fs};
 mod scanner;
+mod parser;
 
 //mod interpreter;
 fn main() {
@@ -20,11 +21,8 @@ fn main() {
         }
     };
     //Takes a string and returns Vec<Vec<Token>>
-    let tokens = scanner::tokenize(input);
-    for token in tokens {
-        println!("{:?}", token);
-    }
-    // let tokens = preproc::process(tokens);
+    let tokenStream = scanner::tokenize(input);
+    let parser = parser::parse(tokenStream);
     //takes Vec<Vec<Token>> and returns a Vec<Token> in order of operations
 
     //let mut interpreter = interpreter::Interpreter::new();

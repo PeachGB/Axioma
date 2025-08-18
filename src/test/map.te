@@ -1,6 +1,6 @@
-axiom setup = {
-if 3 != 2{
-1 + 3
-}
-axio
+
+fn main(){
+let sum = 2+2;
+sum
+
 }
